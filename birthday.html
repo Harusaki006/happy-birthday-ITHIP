@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday 🎀</title>
+
+<!--======================================================
+   CSS
+======================================================-->
+<style>
+  /* ---------- 1. ตัวแปรสี / ฟอนต์ (แก้ธีมได้ที่นี่) ---------- */
+  :root{
+    --pink-deep:   #eb8fa6;   /* ชมพูเข้ม สำหรับหัวข้อ/ปุ่ม */
+    --pink-mid:    #f8cddb;   /* ชมพูกลาง พาสเทล สำหรับพื้นหลัง/แอคเซนต์ */
+    --pink-light:  #fff1f5;   /* ชมพูอ่อนมาก พื้นหลังหลัก */
+    --white:       #ffffff;
+    --text-dark:   #6f4a56;   /* น้ำตาลชมพู สำหรับตัวหนังสือ อ่านง่ายกว่าดำล้วน */
+    --glass-bg:    rgba(255,255,255,0.48);
+    --glass-brd:   rgba(255,255,255,0.7);
+    --shadow-soft: 0 8px 30px rgba(235,143,166,0.25);
+    --font-display: 'Georgia', 'Cormorant Garamond', serif;
+    --font-body: 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+
+  html,body{
+    height:100%;
+    font-family:var(--font-body);
+    color:var(--text-dark);
+    background:
+      radial-gradient(circle at 18% 15%, var(--pink-light), transparent 60%),
+      radial-gradient(circle at 85% 0%, var(--pink-mid), transparent 55%),
+      linear-gradient(180deg, var(--pink-light) 0%, var(--white) 55%, var(--pink-light) 100%);
+    overflow:hidden;
+  }
+
+  #app{
+    position:relative;
+    width:100%;
+    height:100vh;
+    height:100dvh;
+    overflow:hidden;
+  }
+
+  /* ---------- 2. หัวใจลอย (Floating Hearts) ---------- */
+  #hearts-bg{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:1;
+    overflow:hidden;
+  }
+  .heart{
+    position:absolute;
+    bottom:-10%;
+    color:var(--pink-mid);
+    opacity:.75;
+    animation-name: floatUp;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    will-change: transform;
+    filter:drop-shadow(0 2px 4px rgba(235,143,166,.3));
+  }
+  @keyframes floatUp{
+    0%{   transform:translateY(0) translateX(0) rotate(0deg);   opacity:0; }
+    10%{  opacity:.8; }
+    90%{  opacity:.6; }
+    100%{ transform:translateY(-115vh) translateX(var(--drift,20px)) rotate(360deg); opacity:0; }
+  }
+
+  /* หัวใจที่กระจายตอนกดปุ่ม (burst) */
+  .heart-burst{
+    position:fixed;
+    z-index:60;
+    pointer-events:none;
+    animation: burstUp 1.4s ease-out forwards;
+  }
+  @keyframes burstUp{
+    0%{   transform: translate(-50%,-50%) scale(0.3); opacity:1; }
+    100%{ transform: translate(calc(-50% + var(--bx)), calc(-50% + var(--by))) scale(1.1); opacity:0; }
+  }
+
+  /* ---------- 3. โครง Layout หลัก : เนื้อหาตรงกลาง + นำทางติดใต้การ์ดเสมอ ---------- */
+  main{
+    position:relative;
+    z-index:2;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:24px 16px;
+    gap:16px;
+  }
+
+  .page-viewport{
+    width:100%;
+    max-width:480px;
+    flex:1;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:0;
+    position:relative;
+  }
+
+  .page{
+    position:absolute;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    overflow-y:auto;
+    padding:8px 4px 12px;
+    opacity:0;
+    transform:translateY(14px) scale(.98);
+    pointer-events:none;
+    transition:opacity .45s ease, transform .45s ease;
+  }
+  .page.active{
+    opacity:1;
+    transform:translateY(0) scale(1);
+    pointer-events:auto;
+  }
+  .page::-webkit-scrollbar{ width:5px; }
+  .page::-webkit-scrollbar-thumb{ background:var(--pink-mid); border-radius:10px; }
+
+  /* ---------- 4. กรอบใส Glassmorphism ---------- */
+  .glass{
+    background:var(--glass-bg);
+    border:1px solid var(--glass-brd);
+    backdrop-filter: blur(14px) saturate(160%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+    border-radius:26px;
+    box-shadow:var(--shadow-soft);
+  }
+
+  /* ---------- 5. หน้า 1 : HBD ---------- */
+  .page1-title{
+    font-family:var(--font-display);
+    font-style:italic;
+    font-size:clamp(2rem, 8vw, 3.2rem);
+    color:var(--pink-deep);
+    text-align:center;
+    text-shadow:0 2px 10px rgba(235,143,166,.25);
+    letter-spacing:.5px;
+  }
+  .page1-sub{
+    text-align:center;
+    font-size:.95rem;
+    opacity:.85;
+    margin-top:6px;
+    margin-bottom:20px;
+    letter-spacing:1px;
+  }
+
+  .profile-frame{
+    width:min(58vw, 230px);
+    aspect-ratio:1/1;
+    padding:10px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:0 auto 22px;
+  }
+  .profile-frame img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    border-radius:20px;
+    border:3px solid rgba(255,255,255,.85);
+  }
+
+  .btn-primary{
+    font-family:var(--font-body);
+    font-weight:600;
+    font-size:.95rem;
+    letter-spacing:.5px;
+    color:var(--white);
+    background:linear-gradient(135deg, var(--pink-deep), #f4a9be);
+    border:none;
+    padding:14px 32px;
+    border-radius:999px;
+    cursor:pointer;
+    box-shadow:0 6px 18px rgba(235,143,166,.45);
+    transition:transform .15s ease, box-shadow .15s ease;
+    display:block;
+    margin:0 auto;
+  }
+  .btn-primary:hover:not(:disabled){ transform:translateY(-2px); box-shadow:0 10px 22px rgba(235,143,166,.55); }
+  .btn-primary:active:not(:disabled){ transform:translateY(0) scale(.97); }
+  .btn-primary:disabled{
+    opacity:.35;
+    cursor:not-allowed;
+    box-shadow:none;
+    transform:none;
+  }
+
+  /* ---------- 6. หน้า 2 : Gallery (คงไว้เผื่อใช้ที่อื่น) ---------- */
+  .page-title{
+    font-family:var(--font-display);
+    font-style:italic;
+    font-size:clamp(1.5rem,6vw,2.1rem);
+    color:var(--pink-deep);
+    margin-bottom:4px;
+    text-align:center;
+  }
+  .page-sub{
+    font-size:.85rem;
+    opacity:.75;
+    margin-bottom:18px;
+    text-align:center;
+  }
+
+  .gallery-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    width:100%;
+  }
+  .gallery-item{
+    padding:8px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .gallery-item img{
+    width:100%;
+    aspect-ratio:1/1;
+    object-fit:cover;
+    border-radius:16px;
+    border:2px solid rgba(255,255,255,.85);
+  }
+  .gallery-caption{
+    margin-top:8px;
+    font-size:.78rem;
+    text-align:center;
+    font-style:italic;
+    opacity:.85;
+  }
+
+  /* ---------- 6b. หน้า 3 : Blow-the-Cake (เป่าเค้กวันเกิด) ---------- */
+  .cake-stage{
+    width:100%;
+    padding:26px 18px 30px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    position:relative;
+    overflow:visible;
+  }
+
+  .cake-hint{
+    font-size:.85rem;
+    opacity:.75;
+    margin-bottom:22px;
+    text-align:center;
+    transition:opacity .4s ease;
+  }
+  .cake-hint.done{ opacity:.9; color:var(--pink-deep); font-weight:600; }
+
+  /* กล่องเค้กทั้งหมด กดได้ทั้งกล่อง */
+  .cake-wrap{
+    position:relative;
+    width:min(70vw, 260px);
+    cursor:pointer;
+    -webkit-tap-highlight-color:transparent;
+    user-select:none;
+    touch-action:manipulation;
+    transition:transform .15s ease;
+  }
+  .cake-wrap:active{ transform:scale(.97); }
+
+  .cake-svg{ width:100%; height:auto; display:block; overflow:visible; }
+
+  /* เปลวไฟกระพริบตอนยังไม่เป่า */
+  .flame{
+    transform-origin:50% 100%;
+    animation:flicker 1.4s ease-in-out infinite;
+    transition:opacity .35s ease, transform .35s ease;
+  }
+  @keyframes flicker{
+    0%,100%{ transform:scaleY(1) scaleX(1) rotate(0deg); }
+    25%{     transform:scaleY(1.08) scaleX(.94) rotate(-3deg); }
+    50%{     transform:scaleY(.92) scaleX(1.05) rotate(2deg); }
+    75%{     transform:scaleY(1.05) scaleX(.97) rotate(-1deg); }
+  }
+  .flame-glow{
+    animation:glowPulse 1.4s ease-in-out infinite;
+    transition:opacity .35s ease;
+  }
+  @keyframes glowPulse{
+    0%,100%{ opacity:.55; }
+    50%{ opacity:.85; }
+  }
+
+  /* สถานะไฟดับ */
+  .cake-wrap.blown .flame,
+  .cake-wrap.blown .flame-glow{
+    opacity:0;
+    transform:scaleY(.1);
+    animation:none;
+  }
+  .cake-wrap.blown .smoke{
+    animation:smokeRise 1.6s ease-out forwards;
+  }
+  .smoke{ opacity:0; transform-origin:50% 100%; }
+  @keyframes smokeRise{
+    0%{   opacity:0;   transform:translateY(0) scale(.5); }
+    15%{  opacity:.55; }
+    100%{ opacity:0;   transform:translateY(-40px) scale(1.6); }
+  }
+
+  .cake-wrap.blown{ cursor:default; }
+
+  /* Canvas พลุ/คอนเฟตตี้ เต็มจอ */
+  #confettiCanvas{
+    position:fixed;
+    inset:0;
+    z-index:55;
+    pointer-events:none;
+  }
+
+  .countdown-pill{
+    margin-top:20px;
+    font-size:.8rem;
+    opacity:0;
+    color:var(--pink-deep);
+    background:rgba(255,255,255,.55);
+    border:1px solid var(--glass-brd);
+    padding:8px 18px;
+    border-radius:999px;
+    transition:opacity .4s ease;
+  }
+  .countdown-pill.show{ opacity:1; }
+
+  /* ---------- 7. หน้า 3(เดิม) / 4 : Wishes ---------- */
+  .wish-card{
+    width:100%;
+    padding:26px 22px;
+    text-align:center;
+  }
+  .wish-card .wish-icon{
+    font-size:2.2rem;
+    margin-bottom:10px;
+  }
+  .wish-card h3{
+    font-family:var(--font-display);
+    font-style:italic;
+    font-size:1.35rem;
+    color:var(--pink-deep);
+    margin-bottom:12px;
+  }
+  .wish-card p{
+    font-size:.92rem;
+    line-height:1.75;
+  }
+  .wish-signature{
+    margin-top:18px;
+    font-family:var(--font-display);
+    font-style:italic;
+    font-size:.95rem;
+    color:var(--pink-deep);
+    opacity:.9;
+  }
+
+  /* ---------- กล่องของขวัญ + ข้อความเซอร์ไพรส์ (หน้า Wishes) ---------- */
+  .gift-box{
+    text-align:center;
+    margin-top:20px;
+  }
+  .gift-emoji{
+    font-size:3.2rem;
+    cursor:pointer;
+    display:inline-block;
+    transition:transform .25s ease;
+    filter:drop-shadow(0 6px 10px rgba(235,143,166,.4));
+  }
+  .gift-emoji:hover{ transform:scale(1.08) rotate(-4deg); }
+  .gift-emoji.opened{ animation: giftPop .5s ease; }
+  @keyframes giftPop{
+    0%{ transform:scale(1); }
+    40%{ transform:scale(1.35) rotate(8deg); }
+    100%{ transform:scale(1) rotate(0); }
+  }
+  .gift-hint{
+    margin-top:8px;
+    font-size:.8rem;
+    opacity:.7;
+  }
+  .surprise-msg{
+    width:100%;
+    margin-top:16px;
+    padding:0 20px;
+    text-align:center;
+    font-family:var(--font-display);
+    font-style:italic;
+    font-size:1.05rem;
+    color:var(--pink-deep);
+    line-height:1.7;
+    opacity:0;
+    max-height:0;
+    overflow:hidden;
+    transition:opacity .5s ease, max-height .6s ease, padding .5s ease;
+  }
+  .surprise-msg.show{
+    opacity:1;
+    max-height:300px;
+    padding:20px;
+  }
+
+  /* ---------- 8. ปุ่มย้อนกลับทีละหน้า : สไตล์เดียวกับปุ่มส่งหัวใจ ---------- */
+  .btn-back{
+    background:linear-gradient(135deg, #d9a6b3, #f0c3d0);
+    margin-top:14px;
+  }
+
+  /* ---------- 9. หน้า Music Player (เครื่องเล่นเพลง) ---------- */
+  .music-card{
+    width:100%;
+    padding:30px 24px 26px;
+    text-align:center;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+
+  .disc-wrap{
+    width:min(52vw, 210px);
+    aspect-ratio:1/1;
+    border-radius:50%;
+    position:relative;
+    overflow:hidden;
+    margin:0 auto 22px;
+    box-shadow:0 10px 26px rgba(235,143,166,.35);
+    border:3px solid rgba(255,255,255,.85);
+    transition:transform .3s ease;
+  }
+  .disc-wrap img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .disc-wrap::after{
+    /* รูตรงกลางจานเสียง ให้ดูเหมือนแผ่นไวนิลจริงๆ */
+    content:'';
+    position:absolute;
+    top:50%;
+    left:50%;
+    width:16%;
+    height:16%;
+    background:var(--white);
+    border:3px solid var(--pink-mid);
+    border-radius:50%;
+    transform:translate(-50%,-50%);
+    box-shadow:0 2px 8px rgba(0,0,0,.18);
+  }
+  .disc-wrap.spinning{ animation: discSpin 6s linear infinite; }
+  @keyframes discSpin{ from{ transform:rotate(0deg); } to{ transform:rotate(360deg); } }
+
+  .music-title{
+    font-family:var(--font-display);
+    font-style:italic;
+    font-size:1.3rem;
+    color:var(--pink-deep);
+    margin-bottom:4px;
+  }
+  .music-artist{
+    font-size:.82rem;
+    opacity:.75;
+    margin-bottom:20px;
+  }
+
+  .progress-wrap{
+    width:100%;
+    max-width:320px;
+    margin-bottom:6px;
+  }
+  .progress-track{
+    width:100%;
+    height:6px;
+    border-radius:999px;
+    background:rgba(235,143,166,.2);
+    overflow:hidden;
+    cursor:pointer;
+  }
+  .progress-fill{
+    height:100%;
+    width:0%;
+    border-radius:999px;
+    background:linear-gradient(135deg, var(--pink-deep), #f4a9be);
+    transition:width .25s linear;
+  }
+  .time-row{
+    width:100%;
+    max-width:320px;
+    display:flex;
+    justify-content:space-between;
+    font-size:.72rem;
+    opacity:.65;
+    margin-bottom:22px;
+  }
+
+  .play-btn{
+    width:64px;
+    height:64px;
+    border-radius:50%;
+    border:none;
+    background:linear-gradient(135deg, var(--pink-deep), #f4a9be);
+    color:var(--white);
+    font-size:1.6rem;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    box-shadow:0 6px 18px rgba(235,143,166,.45);
+    transition:transform .15s ease, box-shadow .15s ease;
+    margin-bottom:6px;
+  }
+  .play-btn:hover{ transform:translateY(-2px); box-shadow:0 10px 22px rgba(235,143,166,.55); }
+  .play-btn:active{ transform:translateY(0) scale(.95); }
+
+  .music-hint{
+    font-size:.78rem;
+    opacity:.65;
+    margin-bottom:18px;
+  }
+
+  /* ---------- 10. Responsive ---------- */
+  @media (max-width:360px){
+    .btn-primary{ padding:12px 24px; font-size:.85rem; }
+  }
+  @media (min-height:750px){
+    .profile-frame{ width:min(58vw, 250px); }
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ชั้นพื้นหลังหัวใจลอย -->
+  <div id="hearts-bg"></div>
+
+  <!-- Canvas สำหรับเอฟเฟกต์พลุ/คอนเฟตตี้ ตอนเป่าเทียนดับ -->
+  <canvas id="confettiCanvas"></canvas>
+
+  <!-- ---------- เพลง : ไฟล์ MP3 ที่อัปโหลด ควบคุมผ่าน UI เครื่องเล่นเพลงในหน้า 3 ---------- -->
+  <!-- 🔧 หากต้องการเปลี่ยนเพลง แก้ src ของ audio ตรงนี้ -->
+  <audio id="bgAudio" src="song.mp3" preload="metadata" loop></audio>
+
+  <main>
+    <div class="page-viewport">
+
+      <!--======================================================
+         หน้า 1 : HBD
+      ======================================================-->
+      <section class="page active" id="page-hbd">
+        <h1 class="page1-title">Happy Birthday</h1>
+        <p class="page1-sub">✨ ขอให้วันนี้เป็นวันที่พิเศษที่สุด ✨</p>
+
+        <div class="profile-frame glass">
+          <!-- 🔧 แก้รูปโปรไฟล์หลักตรงนี้ -->
+          <img src="T.png" alt="รูปโปรไฟล์">
+        </div>
+
+        <button class="btn-primary nav-burst-btn" data-target="1">ส่งหัวใจให้เธอ 💖</button>
+      </section>
+
+      <!--======================================================
+         หน้า 2 : Music Player (เครื่องเล่นเพลง)
+      ======================================================-->
+      <section class="page" id="page-music">
+        <h2 class="page-title">Our Song</h2>
+        <p class="page-sub">เพลงพิเศษสำหรับเธอ</p>
+
+        <div class="music-card glass">
+          <div class="disc-wrap" id="discWrap">
+            <!-- 🔧 แก้รูปปกเพลง/รูปคู่ตรงนี้ -->
+            <img src="https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/ae/72/35/ae723519-4252-fdc4-55f0-b2cf2d76d291/cover.jpg/200x200cc.jpg">
+          </div>
+
+          <!-- 🔧 แก้ชื่อเพลง/ศิลปินตรงนี้ -->
+          <h3 class="music-title">คำอวยพร (Happy Birthday)</h3>
+          <p class="music-artist">WWJ</p>
+
+          <div class="progress-wrap">
+            <div class="progress-track" id="progressTrack">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+          </div>
+          <div class="time-row">
+            <span id="timeCurrent">0:00</span>
+            <span id="timeDuration">0:00</span>
+          </div>
+
+          <button class="play-btn" id="playBtn" aria-label="เล่น/หยุดเพลง">▶</button>
+          <p class="music-hint" id="musicHint">แตะปุ่มเพื่อเล่นเพลง</p>
+        </div>
+
+        <button class="btn-primary nav-burst-btn" data-target="2" style="margin-top:6px;">Next 💖</button>
+        <button class="btn-primary btn-back nav-burst-btn" data-target="0">Back up</button>
+      </section>
+
+      <!--======================================================
+         หน้า 3 : Blow the Cake (เป่าเค้กวันเกิดแบบ Interactive)
+         🔧 แทนที่กริดรูป 4 ช่องเดิม (gallery-grid) ด้วยบล็อกนี้
+      ======================================================-->
+      <section class="page" id="page-gallery">
+        <h2 class="page-title">Make a Wish</h2>
+        <p class="page-sub">อธิษฐานแล้วเป่าเทียนได้เลย 🎂</p>
+
+        <div class="cake-stage">
+          <p class="cake-hint" id="cakeHint">แตะที่เทียนเพื่อเป่าเค้กให้ดับ 🕯️</p>
+
+          <div class="cake-wrap" id="cakeWrap" role="button" tabindex="0" aria-label="แตะเพื่อเป่าเทียน">
+            <svg class="cake-svg" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+              <!-- เปลวไฟ + แสงเรือง -->
+              <circle class="flame-glow" cx="110" cy="46" r="22" fill="#ffe08a" opacity="0.55"/>
+              <path class="flame" id="flame" d="M110 20 C118 32 122 40 116 50 C113 55 106 55 103 50 C98 41 102 30 110 20 Z" fill="#ffb347"/>
+              <path class="flame" d="M110 30 C114 37 116 42 112 47 C110 50 106 50 105 47 C102 41 105 35 110 30 Z" fill="#fff3b0" opacity="0.9"/>
+              <!-- ควันตอนไฟดับ -->
+              <path class="smoke" d="M110 40 C106 32 114 26 110 18" stroke="#c9bfc4" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+              <!-- ไส้เทียน -->
+              <rect x="107" y="48" width="6" height="14" rx="2" fill="#6f4a56"/>
+              <!-- แท่งเทียน -->
+              <rect x="100" y="58" width="20" height="34" rx="4" fill="#ffffff" stroke="#f4a9be" stroke-width="2"/>
+              <rect x="100" y="58" width="20" height="8" fill="#f8cddb"/>
+
+              <!-- ชั้นเค้กบน -->
+              <ellipse cx="110" cy="94" rx="58" ry="14" fill="#ffe3ec"/>
+              <rect x="52" y="94" width="116" height="30" fill="#fff1f5"/>
+              <ellipse cx="110" cy="124" rx="58" ry="14" fill="#f8cddb"/>
+
+              <!-- ท็อปปิ้งครีมหยดบนชั้นบน -->
+              <path d="M56 96 q4 -14 8 0 q4 -14 8 0 q4 -14 8 0 q4 -14 8 0 q4 -14 8 0 q4 -14 8 0 q4 -14 8 0 q4 -14 8 0 q4 -14 8 0"
+                    fill="none" stroke="#eb8fa6" stroke-width="3" stroke-linecap="round" opacity="0.55"/>
+
+              <!-- ชั้นเค้กล่าง -->
+              <ellipse cx="110" cy="146" rx="76" ry="16" fill="#f4a9be"/>
+              <rect x="34" y="146" width="152" height="38" fill="#eb8fa6"/>
+              <ellipse cx="110" cy="184" rx="76" ry="16" fill="#d9a6b3"/>
+
+              <!-- ลายจุดตกแต่งชั้นล่าง -->
+              <circle cx="60" cy="164" r="4" fill="#fff1f5" opacity="0.8"/>
+              <circle cx="90" cy="170" r="4" fill="#fff1f5" opacity="0.8"/>
+              <circle cx="130" cy="166" r="4" fill="#fff1f5" opacity="0.8"/>
+              <circle cx="160" cy="172" r="4" fill="#fff1f5" opacity="0.8"/>
+            </svg>
+          </div>
+
+          <p class="countdown-pill" id="countdownPill"></p>
+        </div>
+
+        <button class="btn-primary btn-back nav-burst-btn" data-target="1">Back up</button>
+      </section>
+
+      <!--======================================================
+         หน้า 4 : Wishes
+      ======================================================-->
+      <section class="page" id="page-wishes">
+        <h2 class="page-title">Birthday Wishes</h2>
+        <p class="page-sub">คำอวยพรจากใจ</p>
+
+        <div class="wish-card glass">
+          <div class="wish-icon">🎂</div>
+          <!-- 🔧 แก้ข้อความคำอวยพรตรงนี้ -->
+          <h3>สุขสันต์วันเกิดนะค้าบบ</h3>
+          <p>
+            สุขสันต์วันเกิดนะค้าบบพี่! ขอให้พี่อยู่กับผมนานๆ จะได้มีเพื่อนเล่นเกม มีคนคุยด้วยไปเรื่อยๆ ถึงผมจะดื้อ จะกวน จะทำตัวติ๊งต๊องใส่จนโดนพี่ดุพี่บ่นอยู่บ่อยๆ ก็เถอะ
+แต่เนื่องในวันเกิดปีนี้ ก็ขอให้เรื่องร้ายๆ ออกไปจากชีวิตพี่ให้หมด (ยกเว้นผมไว้นะ!) ขอให้พี่สุขภาพแข็งแรง ไม่เจ็บไม่ป่วย การเงินมั่งคั่งราบรื่นไม่ติดขัด ขอให้ปีนี้เป็นปีที่สดใส เต็มไปด้วยความสุข เจอแต่สิ่งดีๆ เข้ามาในชีวิต และขอให้ทุกความฝันเป็นจริงนะ
+ขอบคุณที่เกิดมาเป็นคนพิเศษของทุกคน และไม่ว่าจะผ่านไปกี่ปี เธอก็ยังเป็นคนสำคัญที่สุดในใจฉันเสมอ สุขสันต์วันเกิดอีกครั้งนะค้าบบ 💕
+          </p>
+          <p class="wish-signature">ด้วยรักเสมอ 💌</p>
+        </div>
+
+        <div class="gift-box">
+          <span class="gift-emoji" id="giftBox">🎁</span>
+          <p class="gift-hint">แตะกล่องของขวัญเพื่อเปิดข้อความเซอร์ไพรส์</p>
+        </div>
+
+        <div class="surprise-msg glass" id="surpriseMsg">
+          <!-- 🔧 แก้ข้อความเซอร์ไพรส์ตรงนี้ -->
+          เเต่พี่ก็ยังเป็นคนสำคัญที่สุดในใจผมเสมอ นะหมู 💕
+        </div>
+
+        <button class="btn-primary btn-back nav-burst-btn" data-target="2">Back up</button>
+      </section>
+
+    </div>
+  </main>
+
+</div>
+
+<!--======================================================
+   JavaScript
+======================================================-->
+<script>
+  /* ---------------------------------------------------
+     1) สร้างหัวใจลอยพื้นหลังตลอดเวลา
+  --------------------------------------------------- */
+  const heartsBg = document.getElementById('hearts-bg');
+  const heartChars = ['💗','💕','💖','💓','♡'];
+
+  function spawnBackgroundHeart(){
+    const heart = document.createElement('span');
+    heart.className = 'heart';
+    heart.textContent = heartChars[Math.floor(Math.random() * heartChars.length)];
+
+    const size = 14 + Math.random() * 22;        // ขนาดหัวใจสุ่ม
+    const left = Math.random() * 100;             // ตำแหน่งแนวนอนสุ่ม
+    const duration = 8 + Math.random() * 8;        // ความเร็วลอยสุ่ม
+    const drift = (Math.random() - 0.5) * 160;     // ระยะเบี่ยงซ้าย-ขวา
+
+    heart.style.left = left + 'vw';
+    heart.style.fontSize = size + 'px';
+    heart.style.setProperty('--drift', drift + 'px');
+    heart.style.animationDuration = duration + 's';
+
+    heartsBg.appendChild(heart);
+    setTimeout(() => heart.remove(), duration * 1000 + 500);
+  }
+
+  setInterval(spawnBackgroundHeart, 550);
+  for (let i = 0; i < 8; i++) setTimeout(spawnBackgroundHeart, i * 200);
+
+
+  /* ---------------------------------------------------
+     2) ระบบสลับหน้า (Single Page Navigation) แบบ Prev / Next
+  --------------------------------------------------- */
+  const pageIds = ['page-hbd', 'page-music', 'page-gallery', 'page-wishes'];
+  const pages   = document.querySelectorAll('.page');
+
+  let currentIndex = 0;
+
+  function renderPage(){
+    const activeId = pageIds[currentIndex];
+    pages.forEach(p => p.classList.toggle('active', p.id === activeId));
+  }
+
+  function goToIndex(index){
+    if (index < 0 || index >= pageIds.length) return;
+    currentIndex = index;
+    renderPage();
+  }
+
+  renderPage(); // ตั้งค่าเริ่มต้นตอนโหลดหน้า
+
+
+  /* ---------------------------------------------------
+     3) ปุ่มนำทางทั้งหมด (ไปต่อ + ย้อนกลับ) : ใช้ลูกเล่นหัวใจกระจาย (Burst effect) เหมือนกันทุกปุ่ม
+        ต่างกันแค่ทิศทางที่ไป (data-target = index หน้าที่จะสลับไป)
+  --------------------------------------------------- */
+  function triggerHeartBurst(originEl){
+    const rect = originEl.getBoundingClientRect();
+    const originX = rect.left + rect.width / 2;
+    const originY = rect.top + rect.height / 2;
+
+    const count = 18;
+    for (let i = 0; i < count; i++){
+      const heart = document.createElement('span');
+      heart.className = 'heart-burst';
+      heart.textContent = heartChars[Math.floor(Math.random() * heartChars.length)];
+      heart.style.left = originX + 'px';
+      heart.style.top = originY + 'px';
+      heart.style.fontSize = (16 + Math.random() * 20) + 'px';
+
+      const angle = Math.random() * Math.PI * 2;
+      const distance = 90 + Math.random() * 160;
+      const bx = Math.cos(angle) * distance;
+      const by = Math.sin(angle) * distance - 60; // เอนขึ้นด้านบนเล็กน้อย
+
+      heart.style.setProperty('--bx', bx + 'px');
+      heart.style.setProperty('--by', by + 'px');
+
+      document.body.appendChild(heart);
+      setTimeout(() => heart.remove(), 1500);
+    }
+  }
+
+  const navBurstBtns = document.querySelectorAll('.nav-burst-btn');
+  navBurstBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      triggerHeartBurst(btn);
+      const target = parseInt(btn.dataset.target, 10);
+      // รอให้เอฟเฟกต์หัวใจกระจายเล่นสักครู่ แล้วค่อยสลับหน้าอัตโนมัติ
+      setTimeout(() => goToIndex(target), 900);
+    });
+  });
+
+
+  /* ---------------------------------------------------
+     4) หน้า 4 (wishes) : เปิดกล่องของขวัญเพื่อแสดงข้อความเซอร์ไพรส์
+  --------------------------------------------------- */
+  const giftBox     = document.getElementById('giftBox');
+  const surpriseMsg = document.getElementById('surpriseMsg');
+  let giftOpened = false;
+
+  giftBox.addEventListener('click', () => {
+    giftOpened = !giftOpened;
+    giftBox.textContent = giftOpened ? '💝' : '🎁';
+    giftBox.classList.add('opened');
+    surpriseMsg.classList.toggle('show', giftOpened);
+    setTimeout(() => giftBox.classList.remove('opened'), 500);
+  });
+
+
+  /* ---------------------------------------------------
+     5) หน้า 3 : ระบบเป่าเค้ก + พลุฉลอง + เปลี่ยนหน้าอัตโนมัติ
+  --------------------------------------------------- */
+  const cakeWrap      = document.getElementById('cakeWrap');
+  const cakeHint       = document.getElementById('cakeHint');
+  const countdownPill  = document.getElementById('countdownPill');
+  const confettiCanvas = document.getElementById('confettiCanvas');
+  const ctx            = confettiCanvas.getContext('2d');
+
+  let candleBlown = false;
+  let confettiParticles = [];
+  let confettiAnimId = null;
+  let autoNavTimer = null;
+
+  function resizeCanvas(){
+    confettiCanvas.width  = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  const confettiColors = ['#eb8fa6', '#f8cddb', '#ffb347', '#fff3b0', '#ffffff', '#f4a9be', '#c792ea'];
+
+  // สร้างพลุ 1 ลูก (จุดกำเนิด + อนุภาคที่กระจายตัว)
+  function spawnFirework(x, y){
+    const count = 34;
+    for (let i = 0; i < count; i++){
+      const angle = (Math.PI * 2 * i) / count + Math.random() * 0.2;
+      const speed = 2.6 + Math.random() * 3.6;
+      confettiParticles.push({
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        size: 3 + Math.random() * 3,
+        color: confettiColors[Math.floor(Math.random() * confettiColors.length)],
+        life: 1,
+        decay: 0.008 + Math.random() * 0.012,
+        gravity: 0.045,
+        shape: Math.random() > 0.5 ? 'circle' : 'rect',
+        rotation: Math.random() * Math.PI,
+        rotSpeed: (Math.random() - 0.5) * 0.3
+      });
+    }
+  }
+
+  // ยิงพลุหลายลูกให้เต็มจอ กระจายเวลากันเล็กน้อยให้ดูสวยงามเป็นธรรมชาติ
+  function launchFireworksShow(){
+    const w = confettiCanvas.width;
+    const h = confettiCanvas.height;
+    const bursts = 7;
+    for (let i = 0; i < bursts; i++){
+      setTimeout(() => {
+        const x = w * (0.15 + Math.random() * 0.7);
+        const y = h * (0.15 + Math.random() * 0.45);
+        spawnFirework(x, y);
+      }, i * 260);
+    }
+    if (!confettiAnimId) animateConfetti();
+  }
+
+  function animateConfetti(){
+    ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+
+    confettiParticles.forEach(p => {
+      p.vy += p.gravity;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.life -= p.decay;
+      p.rotation += p.rotSpeed;
+
+      if (p.life <= 0) return;
+
+      ctx.save();
+      ctx.globalAlpha = Math.max(p.life, 0);
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rotation);
+      ctx.fillStyle = p.color;
+      if (p.shape === 'circle'){
+        ctx.beginPath();
+        ctx.arc(0, 0, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        ctx.fillRect(-p.size, -p.size / 2, p.size * 2, p.size);
+      }
+      ctx.restore();
+    });
+
+    confettiParticles = confettiParticles.filter(p => p.life > 0);
+
+    if (confettiParticles.length > 0){
+      confettiAnimId = requestAnimationFrame(animateConfetti);
+    } else {
+      confettiAnimId = null;
+      ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+    }
+  }
+
+  // นับถอยหลัง 15 วินาทีแล้วสลับไปหน้า Wishes (index 3) อัตโนมัติ
+  function startAutoNavCountdown(){
+    let secondsLeft = 5;
+    countdownPill.textContent = `กำลังพาไปหน้าถัดไปใน ${secondsLeft} วินาที...`;
+    countdownPill.classList.add('show');
+
+    autoNavTimer = setInterval(() => {
+      secondsLeft -= 1;
+      if (secondsLeft <= 0){
+        clearInterval(autoNavTimer);
+        countdownPill.classList.remove('show');
+        goToIndex(3); // page-wishes
+      } else {
+        countdownPill.textContent = `กำลังพาไปหน้าถัดไปใน ${secondsLeft} วินาที...`;
+      }
+    }, 1000);
+  }
+
+  // เป่าเทียน : คลิก/แตะที่เค้กหรือเทียน
+  function blowOutCandle(){
+    if (candleBlown) return;
+    candleBlown = true;
+
+    cakeWrap.classList.add('blown');
+    cakeHint.textContent = '🎉 สุขสันต์วันเกิด 🎉';
+    cakeHint.classList.add('done');
+
+    launchFireworksShow();
+    startAutoNavCountdown();
+  }
+
+  cakeWrap.addEventListener('click', blowOutCandle);
+  cakeWrap.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' '){
+      e.preventDefault();
+      blowOutCandle();
+    }
+  });
+
+  // รีเซ็ตสถานะเค้กทุกครั้งที่ออกจากหน้านี้ไปหน้าอื่นแล้ววนกลับมาใหม่
+  function resetCakePage(){
+    candleBlown = false;
+    cakeWrap.classList.remove('blown');
+    cakeHint.textContent = 'แตะที่เทียนเพื่อเป่าเค้กให้ดับ 🕯️';
+    cakeHint.classList.remove('done');
+    countdownPill.classList.remove('show');
+    if (autoNavTimer) clearInterval(autoNavTimer);
+    confettiParticles = [];
+    if (confettiAnimId){ cancelAnimationFrame(confettiAnimId); confettiAnimId = null; }
+    ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+  }
+
+  // ทุกครั้งที่สลับหน้า ถ้าไม่ใช่หน้าเค้กแล้ว ให้รีเซ็ตสถานะไว้เผื่อย้อนกลับมาเป่าใหม่ได้
+  const originalGoToIndex = goToIndex;
+  goToIndex = function(index){
+    originalGoToIndex(index);
+    if (pageIds[index] !== 'page-gallery'){
+      resetCakePage();
+    }
+  };
+
+
+  /* ---------------------------------------------------
+     6) หน้า Music Player : เล่นเพลงจากไฟล์ MP3 ที่อัปโหลด
+        (ควบคุมผ่าน UI เครื่องเล่นเพลงในหน้า 3
+         ผู้ใช้ต้องกดปุ่มเล่นเองเท่านั้น ไม่มี autoplay)
+  --------------------------------------------------- */
+  const bgAudio       = document.getElementById('bgAudio');
+  const playBtn        = document.getElementById('playBtn');
+  const discWrap        = document.getElementById('discWrap');
+  const musicHint       = document.getElementById('musicHint');
+  const progressTrack   = document.getElementById('progressTrack');
+  const progressFill    = document.getElementById('progressFill');
+  const timeCurrentEl   = document.getElementById('timeCurrent');
+  const timeDurationEl  = document.getElementById('timeDuration');
+
+  function formatTime(sec){
+    if (!isFinite(sec) || sec < 0) sec = 0;
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  }
+
+  function updatePlayIcon(isPlaying){
+    playBtn.textContent = isPlaying ? '⏸' : '▶';
+    discWrap.classList.toggle('spinning', isPlaying);
+    musicHint.textContent = isPlaying ? 'กำลังเล่นเพลงอยู่ 🎶' : 'แตะปุ่มเพื่อเล่นเพลง';
+  }
+
+  bgAudio.addEventListener('loadedmetadata', () => {
+    timeDurationEl.textContent = formatTime(bgAudio.duration);
+  });
+
+  bgAudio.addEventListener('timeupdate', () => {
+    const cur = bgAudio.currentTime || 0;
+    const dur = bgAudio.duration || 0;
+    progressFill.style.width = dur ? `${(cur / dur) * 100}%` : '0%';
+    timeCurrentEl.textContent = formatTime(cur);
+  });
+
+  bgAudio.addEventListener('play',  () => updatePlayIcon(true));
+  bgAudio.addEventListener('pause', () => updatePlayIcon(false));
+
+  bgAudio.addEventListener('error', () => {
+    // เล่นไฟล์ไม่ได้ -> ปิดปุ่มเล่นไว้เงียบๆ ไม่ให้ค้าง
+    musicHint.textContent = 'ไม่สามารถเล่นเพลงนี้ได้';
+    playBtn.style.opacity = '0.35';
+    playBtn.style.pointerEvents = 'none';
+  });
+
+  // ปุ่มเล่น/หยุดเพลง : ผู้ใช้ต้องกดเองเท่านั้น
+  playBtn.addEventListener('click', () => {
+    if (bgAudio.paused) {
+      bgAudio.play();
+    } else {
+      bgAudio.pause();
+    }
+  });
+
+  // แตะที่แถบ progress เพื่อ seek ไปยังตำแหน่งที่ต้องการ
+  progressTrack.addEventListener('click', (e) => {
+    if (!bgAudio.duration) return;
+    const rect = progressTrack.getBoundingClientRect();
+    const ratio = Math.min(Math.max((e.clientX - rect.left) / rect.width, 0), 1);
+    bgAudio.currentTime = bgAudio.duration * ratio;
+  });
+</script>
+
+</body>
+</html>
